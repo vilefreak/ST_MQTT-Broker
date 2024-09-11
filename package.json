@@ -1,0 +1,29 @@
+{
+  "name": "st_mqtt-broker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vilefreak/ST_MQTT-Broker.git"
+  },
+  "keywords": [
+    "Broker",
+    "MQTT",
+    "Chat",
+    "Publisher",
+    "Subscriber"
+  ],
+  "author": "Mauricio Villalobos, Elián Pérez, Eduardo Ruiz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vilefreak/ST_MQTT-Broker/issues"
+  },
+  "homepage": "https://github.com/vilefreak/ST_MQTT-Broker#readme",
+  "dependencies": {
+    "mqtt": "^5.10.1"
+  }
+}
