@@ -25,21 +25,17 @@ const rl = readline.createInterface({
 });
 
 let username = ''; // Para almacenar el nombre de usuario
-let publishTopic = ''; // Topic para publicar mensajes
-let subscribeTopic = ''; // Topic para recibir mensajes
+const topic = 'chat_general'; // Topic común para todos los usuarios
 
-// Función para solicitar el nombre de usuario y configurar los topics
+// Función para solicitar el nombre de usuario y configurar el chat
 const promptUser = () => {
   rl.question('Introduce tu nombre de usuario: ', (input) => {
     username = input;
-    publishTopic = `${username}_publish`; // Topic para publicar
-    subscribeTopic = `${username}_receive`; // Topic para recibir
-
-    console.log(`Bienvenido, ${username}! Te suscribirás al topic '${subscribeTopic}' y publicarás en '${publishTopic}'`);
+    console.log(`Bienvenido, ${username}! Estás en el chat.`);
     
-    // Conectar al broker y configurar la subscripción
-    client.subscribe(subscribeTopic, () => {
-      console.log(`Subscrito al topic '${subscribeTopic}' para recibir mensajes.`);
+    // Conectar al broker y suscribirse al topic común
+    client.subscribe(topic, () => {
+      console.log(`Subscrito al topic '${topic}' para recibir mensajes.`);
     });
 
     startChat(); // Iniciar el chat
@@ -52,23 +48,19 @@ const startChat = () => {
     console.log('Conectado al broker MQTT');
   });
 
-  // Cuando el usuario escribe un mensaje, lo publica en su topic de publicación
+  // Cuando el usuario escribe un mensaje, lo publica en el topic común
   rl.on('line', (input) => {
     const message = `${username}: ${input}`;
-    client.publish(publishTopic, message, { qos: 0, retain: false }, (error) => {
+    client.publish(topic, message, { qos: 0, retain: false }, (error) => {
       if (error) {
         console.error('Error al publicar:', error);
-      } else {
-        console.log(`Mensaje enviado al topic '${publishTopic}': ${message}`);
-      }
+      } 
     });
   });
 
   // Maneja la recepción de mensajes desde el broker
   client.on('message', (topic, payload) => {
-    if (topic === subscribeTopic) { // Asegurarse de que solo se muestren mensajes del topic de recepción del usuario
-      console.log(`Mensaje recibido en el topic '${topic}': ${payload.toString()}`);
-    }
+    console.log(`${payload.toString()}`);
   });
 
   // Maneja errores en el cliente MQTT
