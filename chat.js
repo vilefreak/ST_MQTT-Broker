@@ -1,15 +1,14 @@
 const mqtt = require('mqtt');
 const readline = require('readline');
 
-// Configuración de la conexión MQTT
+// Configuración de conexión al broker MQTT
 const protocol = 'mqtt';
-const host = '44.195.13.106'; // IP elástica
+const host = '44.195.13.106'; // Usa la IP elástica
 const port = '1883';
-const clientId = `mqtt_${Math.random().toString(16).slice(3)}`; // Genera un ID de cliente único
+const clientId = `mqtt_${Math.random().toString(16).slice(3)}`; // ID de cliente único
 
-const connectUrl = `${protocol}://${host}:${port}`; // URL de conexión al broker MQTT
+const connectUrl = `${protocol}://${host}:${port}`; // URL de conexión
 
-// Conecta al broker MQTT
 const client = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
@@ -25,43 +24,51 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const topic = 'test'; // Tema de comunicación en MQTT
-let username = ''; // Nombre de usuario para el chat
+let username = ''; // Para almacenar el nombre de usuario
+let publishTopic = ''; // Topic para publicar mensajes
+let subscribeTopic = ''; // Topic para recibir mensajes
 
-// Solicita al usuario su nombre y luego inicia el chat
+// Función para solicitar el nombre de usuario y configurar los topics
 const promptUser = () => {
-  rl.question('Usuario: ', (input) => {
+  rl.question('Introduce tu nombre de usuario: ', (input) => {
     username = input;
-    console.log(`Bienvenido, ${username}! Ahora puedes comenzar a chatear.`);
-    startChat();
+    publishTopic = `${username}_publish`; // Topic para publicar
+    subscribeTopic = `${username}_receive`; // Topic para recibir
+
+    console.log(`Bienvenido, ${username}! Te suscribirás al topic '${subscribeTopic}' y publicarás en '${publishTopic}'`);
+    
+    // Conectar al broker y configurar la subscripción
+    client.subscribe(subscribeTopic, () => {
+      console.log(`Subscrito al topic '${subscribeTopic}' para recibir mensajes.`);
+    });
+
+    startChat(); // Iniciar el chat
   });
 };
 
-// Configura el cliente MQTT para enviar y recibir mensajes
+// Configura el cliente para enviar y recibir mensajes
 const startChat = () => {
-  // Maneja la conexión al broker MQTT
   client.on('connect', () => {
-    console.log('Conectado a MQTT broker');
-    client.subscribe(topic, () => {
-      console.log(`Subscrito al topic '${topic}'`);
-    });
+    console.log('Conectado al broker MQTT');
   });
 
-  // Envía mensajes al broker cuando se recibe input del usuario
+  // Cuando el usuario escribe un mensaje, lo publica en su topic de publicación
   rl.on('line', (input) => {
     const message = `${username}: ${input}`;
-    client.publish(topic, message, { qos: 0, retain: false }, (error) => {
+    client.publish(publishTopic, message, { qos: 0, retain: false }, (error) => {
       if (error) {
         console.error('Error al publicar:', error);
       } else {
-        console.log(`Mensaje enviado al topic '${topic}': ${message}`);
+        console.log(`Mensaje enviado al topic '${publishTopic}': ${message}`);
       }
     });
   });
 
   // Maneja la recepción de mensajes desde el broker
   client.on('message', (topic, payload) => {
-    console.log(`Mensaje recibido en el topic '${topic}': ${payload.toString()}`);
+    if (topic === subscribeTopic) { // Asegurarse de que solo se muestren mensajes del topic de recepción del usuario
+      console.log(`Mensaje recibido en el topic '${topic}': ${payload.toString()}`);
+    }
   });
 
   // Maneja errores en el cliente MQTT
@@ -69,15 +76,10 @@ const startChat = () => {
     console.error('Error del cliente MQTT:', error.message);
   });
 
-  // Notifica cuando el cliente está intentando reconectar
   client.on('reconnect', () => {
-    console.log('Intentando reconectar al broker MQTT...');
+    console.log('Intentando reconectar...');
   });
 };
 
-// Inicia la solicitud del nombre de usuario
+// Inicia el proceso solicitando el nombre de usuario
 promptUser();
-
-// Esta es la base para que podamos hacer como si fueran 2 usuarios chateando, pero me aparece bien en el MQTT Broker, 
-// pero no me aparece bien en la terminal, solo me aparecen por separado, a ver si podemos arreglar eso con el profe
-// o durante el dia :) 
