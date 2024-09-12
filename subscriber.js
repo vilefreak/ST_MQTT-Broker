@@ -32,3 +32,6 @@ const client = mqtt.connect(connectUrl, {
   client.on('message', (topic, payload) => {
     console.log('Received Message:', topic, payload.toString())
   })
+  client.on('error', (error) => {
+    console.error('Error:', error.message)
+  })
