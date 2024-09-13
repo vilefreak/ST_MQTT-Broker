@@ -57,12 +57,14 @@ const startChat = () => {
 
   client.on('message', (topic, payload) => {
     const message = payload.toString();
-    
-    // Evitar mostrar el propio mensaje
-    if (!message.startsWith(`${username}:`)) {
-      console.log(message);
+  
+    if (message.startsWith(`${username}:`)) {
+      console.log(`(Tú): ${message}`);  // Muestra tus mensajes con un indicador
+    } else {
+      console.log(message);  // Muestra los mensajes de los demás
     }
   });
+  
 
   client.on('error', (error) => {
     console.error('Error del cliente MQTT:', error.message);
