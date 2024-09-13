@@ -19,8 +19,8 @@ Esta es una implementación básica de un chat bidireccional usando el protocolo
 
 1. Clona el repositorio:
     ```bash
-    git clone https://github.com/tuusuario/nombre-del-repo.git
-    cd nombre-del-repo
+    git clone https://github.com/vilefreak/ST_MQTT-Broker
+    cd ST_MQTT-Broker
     ```
 
 2. Instala las dependencias:
@@ -32,7 +32,7 @@ Esta es una implementación básica de un chat bidireccional usando el protocolo
 
 1. **Ejecuta la aplicación**:
     ```bash
-    node mqtt-chat.js
+    node chat.js
     ```
 
 2. Introduce tu nombre de usuario cuando se te solicite.
