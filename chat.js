@@ -25,30 +25,27 @@ const rl = readline.createInterface({
 });
 
 let username = ''; // Para almacenar el nombre de usuario
-const topic = 'chat_general'; // Topic común para todos los usuarios
+const topic = 'chat_general'; 
 
-// Función para solicitar el nombre de usuario y configurar el chat
+
 const promptUser = () => {
   rl.question('Introduce tu nombre de usuario: ', (input) => {
     username = input;
     console.log(`Bienvenido, ${username}! Estás en el chat.`);
     
-    // Conectar al broker y suscribirse al topic común
     client.subscribe(topic, () => {
       console.log(`Subscrito al topic '${topic}' para recibir mensajes.`);
     });
 
-    startChat(); // Iniciar el chat
+    startChat(); 
   });
 };
 
-// Configura el cliente para enviar y recibir mensajes
 const startChat = () => {
   client.on('connect', () => {
     console.log('Conectado al broker MQTT');
   });
 
-  // Cuando el usuario escribe un mensaje, lo publica en el topic común
   rl.on('line', (input) => {
     const message = `${username}: ${input}`;
     client.publish(topic, message, { qos: 0, retain: false }, (error) => {
@@ -58,12 +55,11 @@ const startChat = () => {
     });
   });
 
-  // Maneja la recepción de mensajes desde el broker
   client.on('message', (topic, payload) => {
-    console.log(`${payload.toString()}`);
+    if(payload.lastIndexOf(username)==-1)
+      console.log(`${payload.toString()}`);
   });
 
-  // Maneja errores en el cliente MQTT
   client.on('error', (error) => {
     console.error('Error del cliente MQTT:', error.message);
   });
@@ -73,5 +69,4 @@ const startChat = () => {
   });
 };
 
-// Inicia el proceso solicitando el nombre de usuario
 promptUser();
