@@ -24,7 +24,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let username = ''; // Para almacenar el nombre de usuario
+let username = ''; 
 const topic = 'chat_general'; 
 
 
@@ -56,8 +56,12 @@ const startChat = () => {
   });
 
   client.on('message', (topic, payload) => {
-    if(payload.lastIndexOf(username)==-1)
-      console.log(`${payload.toString()}`);
+    const message = payload.toString();
+    
+    // Evitar mostrar el propio mensaje
+    if (!message.startsWith(`${username}:`)) {
+      console.log(message);
+    }
   });
 
   client.on('error', (error) => {
