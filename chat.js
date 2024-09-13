@@ -24,7 +24,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let username = ''; 
+let username = ''; // Para almacenar el nombre de usuario
 const topic = 'chat_general'; 
 
 
@@ -56,15 +56,9 @@ const startChat = () => {
   });
 
   client.on('message', (topic, payload) => {
-    const message = payload.toString();
-  
-    if (message.startsWith(`${username}:`)) {
-      console.log(`(Tú): ${message}`);  // Muestra tus mensajes con un indicador
-    } else {
-      console.log(message);  // Muestra los mensajes de los demás
-    }
+    if(payload.lastIndexOf(username)==-1)
+      console.log(`${payload.toString()}`);
   });
-  
 
   client.on('error', (error) => {
     console.error('Error del cliente MQTT:', error.message);
