@@ -25,7 +25,7 @@ Esta es una implementación básica de un chat bidireccional usando el protocolo
 
 2. Instala las dependencias:
     ```bash
-    npm install mqtt readline
+    npm install mqtt --save
     ```
 
 ## Uso
